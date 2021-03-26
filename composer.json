@@ -20,6 +20,7 @@
     "issues": "https://github.com/ilbee/csv-response/issues"
   },
   "require": {
+    "symfony/symfony": "4.4.*"
   },
   "autoload": {
     "psr-4": { "Ilbee\\CSVResponse\\": "src/" }
