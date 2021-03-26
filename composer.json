@@ -4,6 +4,11 @@
   "description": "Symfony 4 component allow you to respond CSV contents directly in your controller",
   "homepage": "https://github.com/ilbee/csv-response",
   "license": "MIT",
+  "keywords": [
+    "csv",
+    "export",
+    "Symfony controller response"
+  ],
   "authors": [
     {
       "name": "Julien PRIGENT",
