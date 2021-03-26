@@ -15,7 +15,7 @@
     "issues": "https://github.com/ilbee/csv-response/issues"
   },
   "require": {
-    "php": ">=7.4",
+    "php": ">=7.3.*",
     "symfony/symfony": "4.4.*"
   },
   "autoload": {
