@@ -1,8 +1,8 @@
 {
-  "name": "ilbee/CSVResponse",
+  "name": "ilbee/csv-response",
   "type": "package",
   "description": "Symfony 4 component allow you to respond CSV contents directly in your controller",
-  "homepage": "https://github.com/ilbee/CSVResponse",
+  "homepage": "https://github.com/ilbee/csv-response",
   "license": "MIT",
   "authors": [
     {
@@ -12,7 +12,7 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/ilbee/CSVResponse/issues"
+    "issues": "https://github.com/ilbee/csv-response/issues"
   },
   "require": {
     "php": ">=7.4",
