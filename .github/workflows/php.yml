@@ -29,8 +29,8 @@ jobs:
           php_version: ${{ matrix.php-versions }}
 
       - name: PHPUnit (php-actions)
-        uses: php-actions/phpunit@v2
+        uses: php-actions/phpunit@v3.0.3
         with:
           php_version: ${{ matrix.php-versions }}
-          vendored_phpunit_path: ./vendor/bin/phpunit
+          vendored_phpunit_path: vendor/bin/phpunit
           configuration: ./phpunit.xml
