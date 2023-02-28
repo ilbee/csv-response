@@ -11,16 +11,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.2', '7.4', '8.0', '8.1']
+        symfony-versions: ['^4.4', '^5.0', '^6.0']
+        php-versions: ['8.0'] #  ['7.2', '7.4', '8.0', '8.1']
     steps:
       - uses: actions/checkout@v3
 
-      - uses: php-actions/composer@v6
+      - name: Install dependencies
+        uses: php-actions/composer@v6
         with:
-          command: update
           php_version: ${{ matrix.php-versions }}
 
-      - name: PHPUnit Tests
-        uses: php-actions/phpunit@v3
+      - name: Update Symfony
+        uses: php-actions/composer@v6
+        with:
+          command: require
+          args: ${{ matrix.symfony-versions }} -W
+          php_version: ${{ matrix.php-versions }}
+
+      - name: PHPUnit (php-actions)
+        uses: php-actions/phpunit@v2
         with:
           php_version: ${{ matrix.php-versions }}
+          configuration: ./phpunit.xml
