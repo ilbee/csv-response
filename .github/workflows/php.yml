@@ -25,7 +25,7 @@ jobs:
         uses: php-actions/composer@v6
         with:
           command: require
-          args: ${{ matrix.symfony-versions }} -W
+          args: symfony/symfony:${{ matrix.symfony-versions }} -W
           php_version: ${{ matrix.php-versions }}
 
       - name: PHPUnit (php-actions)
