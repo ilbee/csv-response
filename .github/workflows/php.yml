@@ -32,5 +32,6 @@ jobs:
         uses: php-actions/phpunit@v3.0.3
         with:
           php_version: ${{ matrix.php-versions }}
+          # TODO: https://github.com/php-actions/phpunit/issues/51
           vendored_phpunit_path: vendor/bin/phpunit
           configuration: ./phpunit.xml
