@@ -29,7 +29,7 @@ jobs:
           php_version: ${{ matrix.php-versions }}
 
       - name: PHPUnit (php-actions)
-        uses: php-actions/phpunit@v3.0.3
+        uses: php-actions/phpunit@chmod-permission
         with:
           php_version: ${{ matrix.php-versions }}
           # TODO: https://github.com/php-actions/phpunit/issues/51
