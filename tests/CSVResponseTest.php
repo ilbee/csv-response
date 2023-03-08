@@ -27,7 +27,7 @@ class CSVResponseTest extends TestCase
 
     public function testResponse(): void
     {
-        // Defaults to semicolon.
+        // Defaults to semicolon separator.
         $response = new CSVResponse($this->getData());
         $this->assertSame(
             "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
@@ -39,5 +39,6 @@ class CSVResponseTest extends TestCase
             "firstName,lastName\nMarcel,TOTO\nMaurice,TATA\n",
             $response->getContent()
         );
+        $this->assertEquals('text/csv', $response->headers->get('content-type'));
     }
 }

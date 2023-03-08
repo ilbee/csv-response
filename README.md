@@ -5,7 +5,7 @@ CSVResponse
 [![SymfonyInsight](https://insight.symfony.com/projects/98a48652-16bb-4100-89bd-e4ef7579c429/mini.svg)](https://insight.symfony.com/projects/98a48652-16bb-4100-89bd-e4ef7579c429)
 ![Php Composer](https://github.com/ilbee/csv-response/actions/workflows/php.yml/badge.svg) 
 
-Add a CSV export Response in your [Symfony] 4 controller.
+Add a CSV export Response in your [Symfony] controller.
 
 Installation
 ------------
