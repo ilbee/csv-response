@@ -25,7 +25,8 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^9.6",
-    "squizlabs/php_codesniffer": "^3.7"
+    "squizlabs/php_codesniffer": "^3.7",
+    "rector/rector": "^0.15.21"
   },
   "autoload": {
     "psr-4": {
@@ -40,6 +41,9 @@
   "scripts": {
     "phpcbf": "./vendor/bin/phpcbf",
     "phpcs": "./vendor/bin/phpcs",
-    "test": "./vendor/bin/phpunit"
+    "rector": "./vendor/bin/rector process",
+    "rector-dry-run": "./vendor/bin/rector process --dry-run",
+    "test": "./vendor/bin/phpunit",
+    "test-coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html ./coverage"
   }
 }

@@ -6,11 +6,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CSVResponse extends Response
 {
-    private $fileName = 'CSVExport';
-    private $separator;
+    private string $fileName = 'CSVExport';
+    private ?string $separator = null;
 
-    const COMMA = ',';
-    const SEMICOLON = ';';
+    public const COMMA = ',';
+    public const SEMICOLON = ';';
 
     public function __construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON)
     {
