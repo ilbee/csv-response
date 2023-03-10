@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         symfony-versions: ['^4.4', '^5.0', '^6.0']
-        php-versions: ['7.2', '7.4', '8.0', '8.1']
+        php-versions: ['8.1', '8.0', '7.4']
     steps:
       - uses: actions/checkout@v3
 
