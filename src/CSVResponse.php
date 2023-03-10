@@ -17,7 +17,7 @@ class CSVResponse extends Response
         parent::__construct();
 
         $this->separator = $separator;
-        if ( $fileName ) {
+        if ($fileName) {
             $this->fileName = $fileName;
         }
 
@@ -29,7 +29,7 @@ class CSVResponse extends Response
     private function initContent($data): string
     {
         $fp = fopen('php://temp', 'w');
-        foreach ( $this->prepareData($data) as $fields) {
+        foreach ($this->prepareData($data) as $fields) {
             fputcsv($fp, $fields, $this->separator);
         }
 
@@ -44,19 +44,19 @@ class CSVResponse extends Response
     {
         $i = 0;
         $output = [];
-        foreach ( $data as $row ) {
-            if ( $i === 0 ) {
+        foreach ($data as $row) {
+            if ($i === 0) {
                 $head = [];
-                foreach ( $row as $key => $value ) {
+                foreach ($row as $key => $value) {
                     $head[] = $key;
                 }
                 $output[] = $head;
             }
 
             $line = [];
-            foreach ( $row as $key => $value ) {
-                if ( is_object($value) ) {
-                    if ( get_class($value) == 'DateTime' ) {
+            foreach ($row as $key => $value) {
+                if (is_object($value)) {
+                    if (get_class($value) == 'DateTime') {
                         $value = $value->format('Y-m-d H:i:s');
                     }
                 }
