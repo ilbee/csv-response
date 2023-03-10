@@ -39,8 +39,14 @@ class CSVResponseTest extends TestCase
             "firstName,lastName\nMarcel,TOTO\nMaurice,TATA\n",
             $response->getContent()
         );
-        $this->assertEquals('text/csv', $response->headers->get('content-type'));
-        $this->assertEquals('attachment; filename="my-file-name.csv"', $response->headers->get('content-disposition'));
+        $this->assertEquals(
+            'text/csv',
+            $response->headers->get('content-type')
+        );
+        $this->assertEquals(
+            'attachment; filename="my-file-name.csv"',
+            $response->headers->get('content-disposition')
+        );
     }
 
     public function testDateTime(): void
@@ -49,6 +55,9 @@ class CSVResponseTest extends TestCase
         $response = new CSVResponse([
             ['datetime' => $now],
         ]);
-        $this->assertStringContainsString($now->format('Y-m-d H:i:s'), $response->getContent());
+        $this->assertStringContainsString(
+            $now->format('Y-m-d H:i:s'),
+            $response->getContent()
+        );
     }
 }
