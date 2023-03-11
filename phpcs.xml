@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ilbee">
+    <description>PHP CodeSniffer configuration.</description>
+
+    <file>src</file>
+    <file>tests</file>
+    <file>rector.php</file>
+
+    <rule ref="PSR1"/>
+    <rule ref="PSR2"/>
+
+</ruleset>

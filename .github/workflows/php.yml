@@ -7,29 +7,39 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  run:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        symfony-versions: ['^4.4', '^5.0', '^6.0']
+        php-versions: ['8.1', '8.0', '7.4']
+        # Exclude combinations that are not installable.
+        exclude:
+          - symfony-versions: '^6.0'
+            php-versions: '7.4'
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      - name: Install dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-versions }}
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+      - name: Update Symfony
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-versions }}
+          command: require
+          args: symfony/symfony:${{ matrix.symfony-versions }} -W
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
-      
-    - name: PHPUnit (php-actions)
-      uses: php-actions/phpunit@v2
-      with:
-        configuration: ./phpunit.xml
+      - name: PHPUnit (script)
+        run: ./vendor/bin/phpunit
+
+#      - name: PHPUnit (php-actions)
+#        uses: php-actions/phpunit@v3
+#        with:
+#          php_version: ${{ matrix.php-versions }}
+#          # TODO: https://github.com/php-actions/phpunit/issues/51
+#          vendored_phpunit_path: vendor/bin/phpunit
+#          configuration: ./phpunit.xml
