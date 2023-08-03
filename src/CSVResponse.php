@@ -23,7 +23,7 @@ class CSVResponse extends Response
 
         $this->setContent($this->initContent($data));
         $this->headers->set('Content-Type', 'text/csv');
-        $this->headers->set('Content-Disposition', 'attachment; filename="'.$this->fileName.'.csv"');
+        $this->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $this->fileName));
     }
 
     private function initContent($data): string
