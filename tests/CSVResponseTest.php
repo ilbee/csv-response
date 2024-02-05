@@ -34,7 +34,7 @@ class CSVResponseTest extends TestCase
             $response->getContent()
         );
         // Use a comma to separate values.
-        $response = new CSVResponse($this->getData(), 'my-file-name', CSVResponse::COMMA);
+        $response = new CSVResponse($this->getData(), 'my-file-name.csv', CSVResponse::COMMA);
         $this->assertSame(
             "firstName,lastName\nMarcel,TOTO\nMaurice,TATA\n",
             $response->getContent()
