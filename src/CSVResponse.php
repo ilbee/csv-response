@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CSVResponse extends Response
 {
-    private string $fileName = 'CSVExport';
+    private string $fileName = 'CSVExport.csv';
     private ?string $separator = null;
 
     public const COMMA = ',';
@@ -18,7 +18,7 @@ class CSVResponse extends Response
 
         $this->separator = $separator;
         if ($fileName) {
-            $this->fileName = $fileName;
+            $this->setFileName($fileName);
         }
 
         $this->setContent($this->initContent($data));
@@ -26,7 +26,12 @@ class CSVResponse extends Response
         $this->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $this->fileName));
     }
 
-    private function initContent($data): string
+    private function setFileName(string $fileName): void
+    {
+        $this->fileName = $fileName;
+    }
+
+    private function initContent(array $data): string
     {
         $fp = fopen('php://temp', 'w');
         foreach ($this->prepareData($data) as $fields) {
@@ -55,10 +60,8 @@ class CSVResponse extends Response
 
             $line = [];
             foreach ($row as $key => $value) {
-                if (is_object($value)) {
-                    if (get_class($value) == 'DateTime') {
-                        $value = $value->format('Y-m-d H:i:s');
-                    }
+                if (is_object($value) && get_class($value) == 'DateTime') {
+                    $value = $value->format('Y-m-d H:i:s');
                 }
                 $line[] = $value;
             }
