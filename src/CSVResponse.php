@@ -11,6 +11,8 @@ class CSVResponse extends Response
 
     public const COMMA = ',';
     public const SEMICOLON = ';';
+    public const DOUBLEQUOTE = '"';
+    public const DOUBLESLASH = '\\';
 
     public function __construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON)
     {
@@ -35,7 +37,7 @@ class CSVResponse extends Response
     {
         $fp = fopen('php://temp', 'w');
         foreach ($this->prepareData($data) as $fields) {
-            fputcsv($fp, $fields, $this->separator);
+            fputcsv($fp, $fields, $this->separator, self::DOUBLEQUOTE, self::DOUBLESLASH);
         }
 
         rewind($fp);
