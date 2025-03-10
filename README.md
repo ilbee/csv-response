@@ -1,26 +1,36 @@
-CSVResponse
-===========
+# CSVResponse
+==========
 ![Active repository](http://www.repostatus.org/badges/latest/active.svg)
 [![License](https://poser.pugx.org/issei-m/streamed-csv-response/license.svg)](https://packagist.org/packages/ilbee/csv-response)
-[![SymfonyInsight](https://insight.symfony.com/projects/98a48652-16bb-4100-89bd-e4ef7579c429/mini.svg)](https://insight.symfony.com/projects/98a48652-16bb-4100-89bd-e4ef7579c429)
-![Php Composer](https://github.com/ilbee/csv-response/actions/workflows/php.yml/badge.svg) 
+![PHP Composer](https://github.com/ilbee/csv-response/actions/workflows/php.yml/badge.svg)
 
-Add a CSV export Response in your [Symfony] controller.
+Add a CSV export response in your [Symfony] controller.
 
-Installation
-------------
+## 📖 Table of Contents
+----------
+1. [ℹ️ Prerequisites](#-prerequisites)
+2. [⚙ Installation](#-installation)
+3. [🛠️ How to Use](#-how-to-use)
+4. [🔗 Useful Links](#-useful-links)
+5. [🙏 Thanks](#-thanks)
 
-Use [Composer] to install this package :
+## ℹ️ Prerequisites
+----------
+- PHP >= 7.4
+- Symfony >= 4.4
 
-    composer require ilbee/csv-response 
+## ⚙ Installation
+----------
+Use [Composer] to install this package:
+```sh
+composer require ilbee/csv-response
+```
 
-How to use ?
-------------
+## 🛠️ How to use ?
+----------
+Simply return a **CSVResponse** object in your *Symfony controller*, and you will be able to download a CSV file.
 
-Just return a CSVResponse object in your Symfony Controller 
-and you will be able to download a CSV file.
-
-Here is a simple example : 
+Here’s a simple example:
 ```php
 <?php
 // ./src/Controller/MyController.php
@@ -52,5 +62,15 @@ class MyController extends AbstractController
 }
 ```
 
-[Symfony]: https://symfony.com/
-[Composer]: https://getcomposer.org
+### Explanation
+1. **CSVResponse**: This class generates an HTTP response that will trigger a CSV file download based on the provided data.
+2. **Data Example**: You can replace the `$data` array with your own data, fetched from a database or other sources.
+
+## 🔗 Useful Links
+----------
+- [Symfony](https://symfony.com/) - Official Symfony Documentation
+- [Composer](https://getcomposer.org) - PHP Dependency Manager
+
+## 🙏 Thanks
+----------
+Special thanks to [Paul Mitchum](https://github.com/paul-m) and [Dan Feder](https://github.com/dafeder) for their contributions!
