@@ -11,11 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        symfony-versions: ['^4.4', '^5.0', '^6.0']
-        php-versions: ['8.1', '8.0', '7.4']
+        symfony-versions: ['^4.4', '^5.4', '^6.4', '^7.2']
+        php-versions: ['8.4', '8.3', '8.2', '8.1', '8.0', '7.4', '7.3']
         # Exclude combinations that are not installable.
         exclude:
-          - symfony-versions: '^6.0'
+          - symfony-versions: '^6.4'
+            php-versions: '7.3'
+          - symfony-versions: '^6.4'
+            php-versions: '7.4'
+          - symfony-versions: '^7.2'
+            php-versions: '7.3'
+          - symfony-versions: '^7.2'
             php-versions: '7.4'
 
     steps:
@@ -33,13 +39,11 @@ jobs:
           command: require
           args: symfony/symfony:${{ matrix.symfony-versions }} -W
 
-      - name: PHPUnit (script)
-        run: ./vendor/bin/phpunit
+      - name: PHPCS
+        run: ./vendor/bin/phpcs ./src
 
-#      - name: PHPUnit (php-actions)
-#        uses: php-actions/phpunit@v3
-#        with:
-#          php_version: ${{ matrix.php-versions }}
-#          # TODO: https://github.com/php-actions/phpunit/issues/51
-#          vendored_phpunit_path: vendor/bin/phpunit
-#          configuration: ./phpunit.xml
+      - name: PHPStan
+        run: ./vendor/bin/phpstan analyse ./src
+
+      - name: PHPUnit
+        run: ./vendor/bin/phpunit
