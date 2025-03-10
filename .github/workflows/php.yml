@@ -12,15 +12,11 @@ jobs:
     strategy:
       matrix:
         symfony-versions: ['^4.4', '^5.4', '^6.4', '^7.2']
-        php-versions: ['8.4', '8.3', '8.2', '8.1', '8.0', '7.4', '7.3']
+        php-versions: ['8.4', '8.3', '8.2', '8.1', '8.0', '7.4']
         # Exclude combinations that are not installable.
         exclude:
           - symfony-versions: '^6.4'
-            php-versions: '7.3'
-          - symfony-versions: '^6.4'
             php-versions: '7.4'
-          - symfony-versions: '^7.2'
-            php-versions: '7.3'
           - symfony-versions: '^7.2'
             php-versions: '7.4'
           - symfony-versions: '^7.2'
