@@ -11,15 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        symfony-versions: ['^4.4', '^5.4', '^6.4', '^7.2']
+        symfony-versions: ['^4.4', '^5.0', '^6.0', '^7.0']
         php-versions: ['8.4', '8.3', '8.2', '8.1', '8.0', '7.4']
         # Exclude combinations that are not installable.
         exclude:
-          - symfony-versions: '^6.4'
+          - symfony-versions: '^6.0'
             php-versions: '7.4'
-          - symfony-versions: '^7.2'
+          - symfony-versions: '^7.0'
             php-versions: '7.4'
-          - symfony-versions: '^7.2'
+          - symfony-versions: '^7.0'
             php-versions: '8.0'
 
     steps:
