@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  php-cs-fixer:
+    name: PHP CS Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: php-cs-fixer
+
+      - name: Run PHP CS Fixer
+        run: php-cs-fixer fix --dry-run --diff
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dependency-versions: ['highest', 'lowest']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: ${{ matrix.dependency-versions }}
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php-version }}, Symfony ${{ matrix.symfony-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        symfony-version: ['^4.4', '^5.0', '^6.4', '^7.0']
+        exclude:
+          - php-version: '7.4'
+            symfony-version: '^6.4'
+          - php-version: '7.4'
+            symfony-version: '^7.0'
+          - php-version: '8.0'
+            symfony-version: '^6.4'
+          - php-version: '8.0'
+            symfony-version: '^7.0'
+          - php-version: '8.1'
+            symfony-version: '^7.0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Require Symfony version
+        run: composer require symfony/http-foundation:${{ matrix.symfony-version }} --no-interaction --no-update && composer update --no-interaction
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --coverage-text
