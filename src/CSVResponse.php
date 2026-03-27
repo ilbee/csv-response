@@ -64,6 +64,14 @@ class CSVResponse extends Response
             foreach ($row as $key => $value) {
                 if ($value instanceof \DateTimeInterface) {
                     $value = $value->format('Y-m-d H:i:s');
+                } elseif (is_bool($value)) {
+                    $value = $value ? 'true' : 'false';
+                } elseif (is_null($value)) {
+                    $value = '';
+                } elseif (is_array($value)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Nested arrays are not supported in CSV data (column "%s").', $key)
+                    );
                 }
                 $line[] = $value;
             }
