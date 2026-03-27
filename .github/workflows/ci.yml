@@ -50,17 +50,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
-        symfony-version: ['^4.4', '^5.0', '^6.4', '^7.0']
+        php-version: ['8.1', '8.2', '8.3', '8.4']
+        symfony-version: ['^6.4', '^7.0']
         exclude:
-          - php-version: '7.4'
-            symfony-version: '^6.4'
-          - php-version: '7.4'
-            symfony-version: '^7.0'
-          - php-version: '8.0'
-            symfony-version: '^6.4'
-          - php-version: '8.0'
-            symfony-version: '^7.0'
           - php-version: '8.1'
             symfony-version: '^7.0'
     steps:
@@ -76,7 +68,7 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Require Symfony version
-        run: composer require symfony/http-foundation:${{ matrix.symfony-version }} --no-interaction --no-update && composer update --no-interaction
+        run: composer require symfony/http-foundation:${{ matrix.symfony-version }} -W --no-interaction
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit --coverage-text
