@@ -112,6 +112,34 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testCustomDateFormat(): void
+    {
+        $now = new \DateTime('2025-06-15 14:30:00');
+        $response = new CSVResponse(
+            [['datetime' => $now]],
+            null,
+            CSVResponse::SEMICOLON,
+            false,
+            'd/m/Y'
+        );
+        $this->assertSame(
+            "datetime\n15/06/2025\n",
+            $response->getContent()
+        );
+    }
+
+    public function testDefaultDateFormatUnchanged(): void
+    {
+        $now = new \DateTime('2025-06-15 14:30:00');
+        $response = new CSVResponse([
+            ['datetime' => $now],
+        ]);
+        $this->assertStringContainsString(
+            '2025-06-15 14:30:00',
+            $response->getContent()
+        );
+    }
+
     public function testNestedArrayThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
