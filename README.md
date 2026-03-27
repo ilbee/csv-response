@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/ilbee/csv-response/actions/workflows/ci.yml/badge.svg)](https://github.com/ilbee/csv-response/actions/workflows/ci.yml)
 [![PHP](https://img.shields.io/badge/PHP-7.4%2B-8892BF)](https://www.php.net/)
-[![Symfony](https://img.shields.io/badge/Symfony-4.4%20%7C%205.x%20%7C%206.x%20%7C%207.x-black)](https://symfony.com/)
+[![Symfony](https://img.shields.io/badge/Symfony-5.4%20%7C%206.x%20%7C%207.x%20%7C%208.x-black)](https://symfony.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 A Symfony component that lets you return CSV file downloads directly from your controllers.
