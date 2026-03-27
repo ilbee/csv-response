@@ -1,69 +1,113 @@
-# CSVResponse
-![Active repository](http://www.repostatus.org/badges/latest/active.svg)
-[![License](https://poser.pugx.org/issei-m/streamed-csv-response/license.svg)](https://packagist.org/packages/ilbee/csv-response)
-![PHP Composer](https://github.com/ilbee/csv-response/actions/workflows/php.yml/badge.svg)
+# CSV Response
 
-Add a CSV export response in your [Symfony] controller.
+[![CI](https://github.com/ilbee/csv-response/actions/workflows/php.yml/badge.svg)](https://github.com/ilbee/csv-response/actions/workflows/php.yml)
+[![PHP](https://img.shields.io/badge/PHP-7.4%2B-8892BF)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/Symfony-4.4%20%7C%205.x%20%7C%206.x%20%7C%207.x-black)](https://symfony.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-## 📖 Table of Contents
-1. [ℹ️ Prerequisites](#-prerequisites)
-2. [⚙ Installation](#-installation)
-3. [🛠️ How to Use](#-how-to-use)
-4. [🔗 Useful Links](#-useful-links)
-5. [🙏 Thanks](#-thanks)
+A Symfony component that lets you return CSV file downloads directly from your controllers.
 
-## ℹ️ Prerequisites
-- PHP >= 7.4
-- Symfony >= 4.4
+## Table of Contents
 
-## ⚙ Installation
-Use [Composer] to install this package:
-```sh
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
+
+## Features
+
+- Returns a CSV download response from any Symfony controller
+- Automatic header row generation from array keys
+- Configurable separator (semicolon by default, comma, etc.)
+- Custom file name support
+- DateTime objects are automatically formatted
+- No configuration required — just install and use
+
+## Installation
+
+```bash
 composer require ilbee/csv-response
 ```
 
-## 🛠️ How to use ?
-Simply return a **CSVResponse** object in your *Symfony controller*, and you will be able to download a CSV file.
+## Usage
 
-Here’s a simple example:
+### Basic example
+
 ```php
-<?php
-// ./src/Controller/MyController.php
-namespace App\Controller;
-
 use Ilbee\CSVResponse\CSVResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-class MyController extends AbstractController
+class ExportController extends AbstractController
 {
-    /**
-     * @Route("/download-csv", name="download_csv") 
-     */
-    public function downloadCsv(): CSVResponse
+    #[Route('/export', name: 'export_csv')]
+    public function export(): CSVResponse
     {
-        $data = [];
-        $data[] = [
-            'firstName' => 'Marcel',
-            'lastName'  => 'TOTO',
-        ];   
-        $data[] = [
-            'firstName' => 'Maurice',
-            'lastName'  => 'TATA',
+        $data = [
+            ['firstName' => 'Marcel', 'lastName' => 'TOTO'],
+            ['firstName' => 'Maurice', 'lastName' => 'TATA'],
         ];
-        
+
         return new CSVResponse($data);
     }
 }
 ```
 
-### Explanation
-1. **CSVResponse**: This class generates an HTTP response that will trigger a CSV file download based on the provided data.
-2. **Data Example**: You can replace the `$data` array with your own data, fetched from a database or other sources.
+This triggers a download of `CSVExport.csv` with the content:
 
-## 🔗 Useful Links
-- [Symfony](https://symfony.com/) - Official Symfony Documentation
-- [Composer](https://getcomposer.org) - PHP Dependency Manager
+```csv
+firstName;lastName
+Marcel;TOTO
+Maurice;TATA
+```
 
-## 🙏 Thanks
-Special thanks to [Paul Mitchum](https://github.com/paul-m) and [Dan Feder](https://github.com/dafeder) for their contributions!
+### Custom file name
+
+```php
+return new CSVResponse($data, 'users.csv');
+```
+
+### Custom separator
+
+```php
+use Ilbee\CSVResponse\CSVResponse;
+
+// Use comma instead of semicolon
+return new CSVResponse($data, 'users.csv', CSVResponse::COMMA);
+```
+
+## API Reference
+
+### `CSVResponse::__construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON)`
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `$data` | `array` | *(required)* | Array of associative arrays. Keys become the header row. |
+| `$fileName` | `?string` | `CSVExport.csv` | Name of the downloaded file |
+| `$separator` | `?string` | `;` (semicolon) | Field separator |
+
+### Constants
+
+| Constant | Value | Description |
+|---|---|---|
+| `CSVResponse::COMMA` | `,` | Comma separator |
+| `CSVResponse::SEMICOLON` | `;` | Semicolon separator (default) |
+
+## Contributing
+
+```bash
+composer install
+vendor/bin/phpunit
+vendor/bin/phpcs ./src
+```
+
+## Credits
+
+Special thanks to [Paul Mitchum](https://github.com/paul-m) and [Dan Feder](https://github.com/dafeder) for their contributions.
+
+## License
+
+[MIT](LICENSE)
