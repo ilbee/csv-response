@@ -55,7 +55,7 @@ class StreamedCSVResponseTest extends TestCase
         $response = new StreamedCSVResponse($this->getData(), 'my-file.csv');
         $this->assertEquals('text/csv', $response->headers->get('content-type'));
         $this->assertEquals(
-            'attachment; filename="my-file.csv"',
+            'attachment; filename=my-file.csv',
             $response->headers->get('content-disposition')
         );
     }
@@ -64,7 +64,7 @@ class StreamedCSVResponseTest extends TestCase
     {
         $response = new StreamedCSVResponse($this->getData());
         $this->assertEquals(
-            'attachment; filename="CSVExport.csv"',
+            'attachment; filename=CSVExport.csv',
             $response->headers->get('content-disposition')
         );
     }

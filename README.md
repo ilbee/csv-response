@@ -33,6 +33,8 @@ A Symfony component that lets you return CSV file downloads directly from your c
 - DateTime objects are automatically formatted (configurable format)
 - Optional UTF-8 BOM for Excel compatibility
 - CSV injection protection (formula sanitization)
+- Optional row limit (`maxRows`) to prevent unbounded memory usage
+- Strict type handling: clear errors for unsupported object types
 - Accepts arrays, iterables, generators, or callables as data source
 - No configuration required — just install and use
 
@@ -116,6 +118,13 @@ return new CSVResponse($data, 'users.csv', CSVResponseInterface::SEMICOLON, true
 
 ```php
 return new CSVResponse($data, 'users.csv', CSVResponseInterface::SEMICOLON, false, 'd/m/Y');
+```
+
+### Limit number of rows
+
+```php
+// Throws OverflowException if data exceeds 10 000 rows
+return new CSVResponse($data, 'users.csv', CSVResponseInterface::SEMICOLON, false, 'Y-m-d H:i:s', true, true, 10000);
 ```
 
 ### Without header row

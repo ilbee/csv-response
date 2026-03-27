@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-03-27
+
+### Added
+
+- Optional `maxRows` parameter on both `CSVResponse` and `StreamedCSVResponse` to limit the number of rows and prevent unbounded memory usage (throws `OverflowException` when exceeded)
+- Explicit `InvalidArgumentException` when a data value is an object without `__toString()`, instead of a raw PHP error
+
+### Security
+
+- `StreamedCSVResponse` now uses `HeaderUtils::makeDisposition()` for the `Content-Disposition` header (aligned with `CSVResponse`)
+
 ## [1.8.1] - 2026-03-27
 
 ### Security
@@ -110,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - README updates
 
+[1.9.0]: https://github.com/ilbee/csv-response/compare/1.8.1...1.9.0
 [1.8.1]: https://github.com/ilbee/csv-response/compare/1.8.0...1.8.1
 [1.8.0]: https://github.com/ilbee/csv-response/compare/1.7.1...1.8.0
 [1.7.1]: https://github.com/ilbee/csv-response/compare/1.7.0...1.7.1
