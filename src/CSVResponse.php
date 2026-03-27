@@ -2,6 +2,7 @@
 
 namespace Ilbee\CSVResponse;
 
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 class CSVResponse extends Response implements CSVResponseInterface
@@ -32,7 +33,10 @@ class CSVResponse extends Response implements CSVResponseInterface
         $this->headers->set('Content-Type', 'text/csv');
         $this->headers->set(
             'Content-Disposition',
-            sprintf('attachment; filename="%s"', $this->fileName)
+            HeaderUtils::makeDisposition(
+                HeaderUtils::DISPOSITION_ATTACHMENT,
+                $this->fileName
+            )
         );
     }
 

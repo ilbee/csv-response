@@ -43,7 +43,7 @@ class CSVResponseTest extends TestCase
             $response->headers->get('content-type')
         );
         $this->assertEquals(
-            'attachment; filename="my-file-name.csv"',
+            'attachment; filename=my-file-name.csv',
             $response->headers->get('content-disposition')
         );
     }
@@ -300,7 +300,7 @@ class CSVResponseTest extends TestCase
             '../../etc/passwd'
         );
         $this->assertEquals(
-            'attachment; filename="passwd"',
+            'attachment; filename=passwd',
             $response->headers->get('content-disposition')
         );
     }
@@ -312,7 +312,7 @@ class CSVResponseTest extends TestCase
             "\r\n"
         );
         $this->assertEquals(
-            'attachment; filename="CSVExport.csv"',
+            'attachment; filename=CSVExport.csv',
             $response->headers->get('content-disposition')
         );
     }
