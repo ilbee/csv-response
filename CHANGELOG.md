@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-03-27
+
+### Changed
+
+- Dropped Symfony 4.x support (EOL since November 2023)
+- Updated `symfony/http-foundation` constraint to `^5.4 || ^6.4 || ^7.0 || ^8.0`
+- Extended CI matrix to test Symfony 5.4 and 8.0
+
 ## [1.7.1] - 2026-03-27
 
 ### Security
@@ -96,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - README updates
 
+[1.8.0]: https://github.com/ilbee/csv-response/compare/1.7.1...1.8.0
 [1.7.1]: https://github.com/ilbee/csv-response/compare/1.7.0...1.7.1
 [1.7.0]: https://github.com/ilbee/csv-response/compare/1.6.1...1.7.0
 [1.6.1]: https://github.com/ilbee/csv-response/compare/1.6.0...1.6.1
