@@ -82,8 +82,25 @@ trait CSVResponseTrait
         $this->dateFormat = $dateFormat;
         $this->sanitizeFormulas = $sanitizeFormulas;
         if ($fileName) {
-            $this->fileName = $fileName;
+            $this->fileName = $this->sanitizeFileName($fileName);
         }
+    }
+
+    private function sanitizeFileName(string $fileName): string
+    {
+        $fileName = str_replace(
+            ["\r", "\n", "\t", '"', "\0"],
+            '',
+            $fileName
+        );
+
+        $fileName = basename($fileName);
+
+        if ($fileName === '' || $fileName === '.') {
+            return 'CSVExport.csv';
+        }
+
+        return $fileName;
     }
 
     /**
@@ -107,6 +124,14 @@ trait CSVResponseTrait
      */
     private function extractHeaders(array $row): array
     {
-        return array_keys($row);
+        $headers = array_keys($row);
+
+        if ($this->sanitizeFormulas) {
+            $headers = array_map(function ($header) {
+                return $this->sanitizeValue($header);
+            }, $headers);
+        }
+
+        return $headers;
     }
 }
