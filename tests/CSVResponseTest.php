@@ -94,6 +94,24 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testBomDisabledByDefault(): void
+    {
+        $response = new CSVResponse($this->getData());
+        $this->assertStringStartsNotWith("\xEF\xBB\xBF", $response->getContent());
+    }
+
+    public function testBomEnabled(): void
+    {
+        $response = new CSVResponse($this->getData(), null, CSVResponse::SEMICOLON, true);
+        $content = $response->getContent();
+        $this->assertStringStartsWith("\xEF\xBB\xBF", $content);
+        // Content after BOM is the normal CSV
+        $this->assertSame(
+            "\xEF\xBB\xBF" . "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $content
+        );
+    }
+
     public function testNestedArrayThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);

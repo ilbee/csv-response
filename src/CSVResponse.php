@@ -14,8 +14,12 @@ class CSVResponse extends Response
     public const DOUBLEQUOTE = '"';
     public const DOUBLESLASH = '\\';
 
-    public function __construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON)
-    {
+    public function __construct(
+        array $data,
+        ?string $fileName = null,
+        ?string $separator = self::SEMICOLON,
+        bool $addBom = false
+    ) {
         parent::__construct();
 
         $this->separator = $separator;
@@ -23,7 +27,11 @@ class CSVResponse extends Response
             $this->setFileName($fileName);
         }
 
-        $this->setContent($this->initContent($data));
+        $content = $this->initContent($data);
+        if ($addBom) {
+            $content = "\xEF\xBB\xBF" . $content;
+        }
+        $this->setContent($content);
         $this->headers->set('Content-Type', 'text/csv');
         $this->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $this->fileName));
     }
