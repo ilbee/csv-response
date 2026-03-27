@@ -355,4 +355,48 @@ class CSVResponseTest extends TestCase
         $this->assertStringContainsString("'+SUM", $content);
         $this->assertStringContainsString("'@import", $content);
     }
+
+    public function testMaxRowsAllowsDataWithinLimit(): void
+    {
+        $response = new CSVResponse(
+            $this->getData(),
+            null,
+            CSVResponse::SEMICOLON,
+            false,
+            'Y-m-d H:i:s',
+            true,
+            true,
+            10
+        );
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
+    public function testMaxRowsThrowsWhenExceeded(): void
+    {
+        $this->expectException(\OverflowException::class);
+        $this->expectExceptionMessage('maximum allowed number of rows (1)');
+
+        new CSVResponse(
+            $this->getData(),
+            null,
+            CSVResponse::SEMICOLON,
+            false,
+            'Y-m-d H:i:s',
+            true,
+            true,
+            1
+        );
+    }
+
+    public function testMaxRowsNullMeansNoLimit(): void
+    {
+        $response = new CSVResponse($this->getData());
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
 }

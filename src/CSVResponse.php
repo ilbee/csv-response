@@ -19,13 +19,14 @@ class CSVResponse extends Response implements CSVResponseInterface
         bool $addBom = false,
         string $dateFormat = 'Y-m-d H:i:s',
         bool $includeHeaders = true,
-        bool $sanitizeFormulas = true
+        bool $sanitizeFormulas = true,
+        ?int $maxRows = null
     ) {
         parent::__construct();
 
         $this->initCSVProperties($fileName, $separator, $dateFormat, $sanitizeFormulas);
 
-        $content = $this->initContent($this->resolveData($data), $includeHeaders);
+        $content = $this->initContent($this->resolveData($data), $includeHeaders, $maxRows);
         if ($addBom) {
             $content = "\xEF\xBB\xBF" . $content;
         }
@@ -40,11 +41,19 @@ class CSVResponse extends Response implements CSVResponseInterface
         );
     }
 
-    private function initContent(iterable $data, bool $includeHeaders = true): string
-    {
+    private function initContent(
+        iterable $data,
+        bool $includeHeaders = true,
+        ?int $maxRows = null
+    ): string {
         $fp = fopen('php://temp', 'w');
         $i = 0;
         foreach ($data as $row) {
+            if ($maxRows !== null && $i >= $maxRows) {
+                throw new \OverflowException(
+                    sprintf('Data exceeds the maximum allowed number of rows (%d).', $maxRows)
+                );
+            }
             if ($i === 0 && $includeHeaders) {
                 fputcsv(
                     $fp,
