@@ -317,6 +317,31 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testObjectWithToStringIsConverted(): void
+    {
+        $obj = new class {
+            public function __toString(): string
+            {
+                return 'string-value';
+            }
+        };
+
+        $response = new CSVResponse([
+            ['name' => 'Marcel', 'value' => $obj],
+        ]);
+        $this->assertStringContainsString('string-value', $response->getContent());
+    }
+
+    public function testObjectWithoutToStringThrowsException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('cannot be converted to string');
+
+        new CSVResponse([
+            ['name' => 'Marcel', 'value' => new \stdClass()],
+        ]);
+    }
+
     public function testFormulaInjectionInHeaders(): void
     {
         $data = [

@@ -54,6 +54,14 @@ trait CSVResponseTrait
             throw new \InvalidArgumentException(
                 sprintf('Nested arrays are not supported in CSV data (column "%s").', $key)
             );
+        } elseif (is_object($value) && !method_exists($value, '__toString')) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Object of class "%s" cannot be converted to string (column "%s").',
+                    get_class($value),
+                    $key
+                )
+            );
         }
 
         return $value;
