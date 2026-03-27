@@ -20,10 +20,11 @@ A Symfony component that lets you return CSV file downloads directly from your c
 ## Features
 
 - Returns a CSV download response from any Symfony controller
-- Automatic header row generation from array keys
+- Automatic header row generation from array keys (can be disabled)
 - Configurable separator (semicolon by default, comma, etc.)
 - Custom file name support
-- DateTime objects are automatically formatted
+- DateTime objects are automatically formatted (configurable format)
+- Optional UTF-8 BOM for Excel compatibility
 - No configuration required — just install and use
 
 ## Installation
@@ -79,15 +80,47 @@ use Ilbee\CSVResponse\CSVResponse;
 return new CSVResponse($data, 'users.csv', CSVResponse::COMMA);
 ```
 
+### UTF-8 BOM (for Excel)
+
+```php
+return new CSVResponse($data, 'users.csv', CSVResponse::SEMICOLON, true);
+```
+
+### Custom date format
+
+```php
+return new CSVResponse($data, 'users.csv', CSVResponse::SEMICOLON, false, 'd/m/Y');
+```
+
+### Without header row
+
+```php
+return new CSVResponse($data, 'users.csv', CSVResponse::SEMICOLON, false, 'Y-m-d H:i:s', false);
+```
+
 ## API Reference
 
-### `CSVResponse::__construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON)`
+### `CSVResponse::__construct()`
+
+```php
+new CSVResponse(
+    array $data,
+    ?string $fileName = null,
+    ?string $separator = self::SEMICOLON,
+    bool $addBom = false,
+    string $dateFormat = 'Y-m-d H:i:s',
+    bool $includeHeaders = true
+)
+```
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `$data` | `array` | *(required)* | Array of associative arrays. Keys become the header row. |
 | `$fileName` | `?string` | `CSVExport.csv` | Name of the downloaded file |
 | `$separator` | `?string` | `;` (semicolon) | Field separator |
+| `$addBom` | `bool` | `false` | Prepend UTF-8 BOM (useful for Excel) |
+| `$dateFormat` | `string` | `Y-m-d H:i:s` | Format string for DateTime values |
+| `$includeHeaders` | `bool` | `true` | Include a header row from array keys |
 
 ### Constants
 
