@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Ilbee\CSVResponse\Tests;
 
 use Ilbee\CSVResponse\CSVResponse;
