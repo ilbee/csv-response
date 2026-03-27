@@ -4,23 +4,15 @@ namespace Ilbee\CSVResponse;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class CSVResponse extends Response
+class CSVResponse extends Response implements CSVResponseInterface
 {
-    private string $fileName = 'CSVExport.csv';
-    private ?string $separator = null;
-    private string $dateFormat = 'Y-m-d H:i:s';
+    use CSVResponseTrait;
 
-    public const COMMA = ',';
-    public const SEMICOLON = ';';
-    public const DOUBLEQUOTE = '"';
-    public const DOUBLESLASH = '\\';
-
-    private bool $sanitizeFormulas = true;
-
-    private const FORMULA_PREFIXES = ['=', '+', '-', '@', "\t", "\r", "\n"];
-
+    /**
+     * @param iterable|callable $data
+     */
     public function __construct(
-        iterable $data,
+        $data,
         ?string $fileName = null,
         ?string $separator = self::SEMICOLON,
         bool $addBom = false,
@@ -30,32 +22,42 @@ class CSVResponse extends Response
     ) {
         parent::__construct();
 
-        $this->separator = $separator;
-        $this->dateFormat = $dateFormat;
-        $this->sanitizeFormulas = $sanitizeFormulas;
-        if ($fileName) {
-            $this->setFileName($fileName);
-        }
+        $this->initCSVProperties($fileName, $separator, $dateFormat, $sanitizeFormulas);
 
-        $content = $this->initContent($data, $includeHeaders);
+        $content = $this->initContent($this->resolveData($data), $includeHeaders);
         if ($addBom) {
             $content = "\xEF\xBB\xBF" . $content;
         }
         $this->setContent($content);
         $this->headers->set('Content-Type', 'text/csv');
-        $this->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $this->fileName));
-    }
-
-    private function setFileName(string $fileName): void
-    {
-        $this->fileName = $fileName;
+        $this->headers->set(
+            'Content-Disposition',
+            sprintf('attachment; filename="%s"', $this->fileName)
+        );
     }
 
     private function initContent(iterable $data, bool $includeHeaders = true): string
     {
         $fp = fopen('php://temp', 'w');
-        foreach ($this->prepareData($data, $includeHeaders) as $fields) {
-            fputcsv($fp, $fields, $this->separator, self::DOUBLEQUOTE, self::DOUBLESLASH);
+        $i = 0;
+        foreach ($data as $row) {
+            if ($i === 0 && $includeHeaders) {
+                fputcsv(
+                    $fp,
+                    $this->extractHeaders($row),
+                    $this->separator,
+                    self::DOUBLEQUOTE,
+                    self::DOUBLESLASH
+                );
+            }
+            fputcsv(
+                $fp,
+                $this->convertRow($row),
+                $this->separator,
+                self::DOUBLEQUOTE,
+                self::DOUBLESLASH
+            );
+            $i++;
         }
 
         rewind($fp);
@@ -63,46 +65,5 @@ class CSVResponse extends Response
         fclose($fp);
 
         return $content;
-    }
-
-    private function prepareData(iterable $data, bool $includeHeaders = true): array
-    {
-        $i = 0;
-        $output = [];
-        foreach ($data as $row) {
-            if ($i === 0 && $includeHeaders) {
-                $head = [];
-                foreach ($row as $key => $value) {
-                    $head[] = $key;
-                }
-                $output[] = $head;
-            }
-
-            $line = [];
-            foreach ($row as $key => $value) {
-                if ($value instanceof \DateTimeInterface) {
-                    $value = $value->format($this->dateFormat);
-                } elseif (is_bool($value)) {
-                    $value = $value ? 'true' : 'false';
-                } elseif (is_null($value)) {
-                    $value = '';
-                } elseif (is_array($value)) {
-                    throw new \InvalidArgumentException(
-                        sprintf('Nested arrays are not supported in CSV data (column "%s").', $key)
-                    );
-                }
-
-                if ($this->sanitizeFormulas && is_string($value) && isset($value[0]) && in_array($value[0], self::FORMULA_PREFIXES, true)) {
-                    $value = "'" . $value;
-                }
-
-                $line[] = $value;
-            }
-            $output[] = $line;
-
-            $i++;
-        }
-
-        return $output;
     }
 }
