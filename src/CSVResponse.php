@@ -14,8 +14,12 @@ class CSVResponse extends Response
     public const DOUBLEQUOTE = '"';
     public const DOUBLESLASH = '\\';
 
-    public function __construct(array $data, ?string $fileName = null, ?string $separator = self::SEMICOLON, bool $addBom = false)
-    {
+    public function __construct(
+        array $data,
+        ?string $fileName = null,
+        ?string $separator = self::SEMICOLON,
+        bool $addBom = false
+    ) {
         parent::__construct();
 
         $this->separator = $separator;
