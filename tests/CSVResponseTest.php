@@ -280,4 +280,54 @@ class CSVResponseTest extends TestCase
             return 'not iterable';
         });
     }
+
+    public function testFileNameSanitizesHeaderInjection(): void
+    {
+        $response = new CSVResponse(
+            $this->getData(),
+            "evil.csv\"\r\nX-Injected: true"
+        );
+        $disposition = $response->headers->get('content-disposition');
+        $this->assertStringNotContainsString("\r", $disposition);
+        $this->assertStringNotContainsString("\n", $disposition);
+        $this->assertStringNotContainsString('"evil.csv"', $disposition);
+    }
+
+    public function testFileNameSanitizesPathTraversal(): void
+    {
+        $response = new CSVResponse(
+            $this->getData(),
+            '../../etc/passwd'
+        );
+        $this->assertEquals(
+            'attachment; filename="passwd"',
+            $response->headers->get('content-disposition')
+        );
+    }
+
+    public function testFileNameFallbackOnEmpty(): void
+    {
+        $response = new CSVResponse(
+            $this->getData(),
+            "\r\n"
+        );
+        $this->assertEquals(
+            'attachment; filename="CSVExport.csv"',
+            $response->headers->get('content-disposition')
+        );
+    }
+
+    public function testFormulaInjectionInHeaders(): void
+    {
+        $data = [
+            ['=CMD' => 'value1', '+SUM' => 'value2', '@import' => 'value3'],
+        ];
+
+        $response = new CSVResponse($data);
+        $content = $response->getContent();
+
+        $this->assertStringContainsString("'=CMD", $content);
+        $this->assertStringContainsString("'+SUM", $content);
+        $this->assertStringContainsString("'@import", $content);
+    }
 }
