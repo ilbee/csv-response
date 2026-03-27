@@ -15,18 +15,24 @@ class CSVResponse extends Response
     public const DOUBLEQUOTE = '"';
     public const DOUBLESLASH = '\\';
 
+    private bool $sanitizeFormulas = true;
+
+    private const FORMULA_PREFIXES = ['=', '+', '-', '@', "\t", "\r", "\n"];
+
     public function __construct(
         iterable $data,
         ?string $fileName = null,
         ?string $separator = self::SEMICOLON,
         bool $addBom = false,
         string $dateFormat = 'Y-m-d H:i:s',
-        bool $includeHeaders = true
+        bool $includeHeaders = true,
+        bool $sanitizeFormulas = true
     ) {
         parent::__construct();
 
         $this->separator = $separator;
         $this->dateFormat = $dateFormat;
+        $this->sanitizeFormulas = $sanitizeFormulas;
         if ($fileName) {
             $this->setFileName($fileName);
         }
@@ -85,6 +91,11 @@ class CSVResponse extends Response
                         sprintf('Nested arrays are not supported in CSV data (column "%s").', $key)
                     );
                 }
+
+                if ($this->sanitizeFormulas && is_string($value) && isset($value[0]) && in_array($value[0], self::FORMULA_PREFIXES, true)) {
+                    $value = "'" . $value;
+                }
+
                 $line[] = $value;
             }
             $output[] = $line;

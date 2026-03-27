@@ -193,6 +193,61 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testFormulaInjectionSanitized(): void
+    {
+        $data = [
+            ['name' => '=CMD|"/C calc"!A0', 'email' => 'test@test.com'],
+            ['name' => '+SUM(A1:A2)', 'email' => '-data'],
+            ['name' => '@import', 'email' => "\tmalicious"],
+        ];
+
+        $response = new CSVResponse($data);
+        $content = $response->getContent();
+
+        $this->assertStringContainsString("'=CMD", $content);
+        $this->assertStringContainsString("'+SUM", $content);
+        $this->assertStringContainsString("'-data", $content);
+        $this->assertStringContainsString("'@import", $content);
+        $this->assertStringNotContainsString(";=CMD", $content);
+        $this->assertStringNotContainsString(";+SUM", $content);
+        $this->assertStringNotContainsString(";@import", $content);
+    }
+
+    public function testFormulaInjectionSanitizationDisabled(): void
+    {
+        $data = [
+            ['name' => '=SUM(A1:A2)'],
+        ];
+
+        $response = new CSVResponse(
+            $data,
+            null,
+            CSVResponse::SEMICOLON,
+            false,
+            'Y-m-d H:i:s',
+            true,
+            false
+        );
+        $content = $response->getContent();
+
+        $this->assertStringContainsString('=SUM(A1:A2)', $content);
+        $this->assertStringNotContainsString("'=SUM", $content);
+    }
+
+    public function testSafeValuesNotPrefixed(): void
+    {
+        $data = [
+            ['name' => 'Marcel', 'amount' => '100'],
+        ];
+
+        $response = new CSVResponse($data);
+        $content = $response->getContent();
+
+        $this->assertStringContainsString('Marcel', $content);
+        $this->assertStringNotContainsString("'Marcel", $content);
+        $this->assertStringNotContainsString("'100", $content);
+    }
+
     public function testNestedArrayThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
