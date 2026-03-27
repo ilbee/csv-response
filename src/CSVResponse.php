@@ -62,7 +62,7 @@ class CSVResponse extends Response
 
             $line = [];
             foreach ($row as $key => $value) {
-                if (is_object($value) && get_class($value) == 'DateTime') {
+                if ($value instanceof \DateTimeInterface) {
                     $value = $value->format('Y-m-d H:i:s');
                 }
                 $line[] = $value;

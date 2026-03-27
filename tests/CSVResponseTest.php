@@ -59,4 +59,16 @@ class CSVResponseTest extends TestCase
             $response->getContent()
         );
     }
+
+    public function testDateTimeImmutable(): void
+    {
+        $now = new \DateTimeImmutable();
+        $response = new CSVResponse([
+            ['datetime' => $now],
+        ]);
+        $this->assertStringContainsString(
+            $now->format('Y-m-d H:i:s'),
+            $response->getContent()
+        );
+    }
 }
