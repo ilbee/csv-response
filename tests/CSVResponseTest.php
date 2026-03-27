@@ -165,6 +165,34 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testIterableWithGenerator(): void
+    {
+        $generator = function () {
+            yield ['firstName' => 'Marcel', 'lastName' => 'TOTO'];
+            yield ['firstName' => 'Maurice', 'lastName' => 'TATA'];
+        };
+
+        $response = new CSVResponse($generator());
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
+    public function testIterableWithArrayIterator(): void
+    {
+        $iterator = new \ArrayIterator([
+            ['firstName' => 'Marcel', 'lastName' => 'TOTO'],
+            ['firstName' => 'Maurice', 'lastName' => 'TATA'],
+        ]);
+
+        $response = new CSVResponse($iterator);
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
     public function testNestedArrayThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);

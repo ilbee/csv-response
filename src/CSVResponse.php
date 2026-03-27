@@ -16,7 +16,7 @@ class CSVResponse extends Response
     public const DOUBLESLASH = '\\';
 
     public function __construct(
-        array $data,
+        iterable $data,
         ?string $fileName = null,
         ?string $separator = self::SEMICOLON,
         bool $addBom = false,
@@ -45,7 +45,7 @@ class CSVResponse extends Response
         $this->fileName = $fileName;
     }
 
-    private function initContent(array $data, bool $includeHeaders = true): string
+    private function initContent(iterable $data, bool $includeHeaders = true): string
     {
         $fp = fopen('php://temp', 'w');
         foreach ($this->prepareData($data, $includeHeaders) as $fields) {
@@ -59,7 +59,7 @@ class CSVResponse extends Response
         return $content;
     }
 
-    private function prepareData(array $data, bool $includeHeaders = true): array
+    private function prepareData(iterable $data, bool $includeHeaders = true): array
     {
         $i = 0;
         $output = [];
