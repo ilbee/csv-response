@@ -256,4 +256,28 @@ class CSVResponseTest extends TestCase
             ['name' => 'Marcel', 'tags' => ['a', 'b']],
         ]);
     }
+
+    public function testCallableDataSource(): void
+    {
+        $callable = function () {
+            return [
+                ['firstName' => 'Marcel', 'lastName' => 'TOTO'],
+                ['firstName' => 'Maurice', 'lastName' => 'TATA'],
+            ];
+        };
+        $response = new CSVResponse($callable);
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
+    public function testCallableReturningNonIterableThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The callable must return an iterable.');
+        new CSVResponse(function () {
+            return 'not iterable';
+        });
+    }
 }
