@@ -140,6 +140,31 @@ class CSVResponseTest extends TestCase
         );
     }
 
+    public function testHeadersIncludedByDefault(): void
+    {
+        $response = new CSVResponse($this->getData());
+        $this->assertSame(
+            "firstName;lastName\nMarcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
+    public function testHeadersDisabled(): void
+    {
+        $response = new CSVResponse(
+            $this->getData(),
+            null,
+            CSVResponse::SEMICOLON,
+            false,
+            'Y-m-d H:i:s',
+            false
+        );
+        $this->assertSame(
+            "Marcel;TOTO\nMaurice;TATA\n",
+            $response->getContent()
+        );
+    }
+
     public function testNestedArrayThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);

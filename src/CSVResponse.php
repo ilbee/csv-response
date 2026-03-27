@@ -20,7 +20,8 @@ class CSVResponse extends Response
         ?string $fileName = null,
         ?string $separator = self::SEMICOLON,
         bool $addBom = false,
-        string $dateFormat = 'Y-m-d H:i:s'
+        string $dateFormat = 'Y-m-d H:i:s',
+        bool $includeHeaders = true
     ) {
         parent::__construct();
 
@@ -30,7 +31,7 @@ class CSVResponse extends Response
             $this->setFileName($fileName);
         }
 
-        $content = $this->initContent($data);
+        $content = $this->initContent($data, $includeHeaders);
         if ($addBom) {
             $content = "\xEF\xBB\xBF" . $content;
         }
@@ -44,10 +45,10 @@ class CSVResponse extends Response
         $this->fileName = $fileName;
     }
 
-    private function initContent(array $data): string
+    private function initContent(array $data, bool $includeHeaders = true): string
     {
         $fp = fopen('php://temp', 'w');
-        foreach ($this->prepareData($data) as $fields) {
+        foreach ($this->prepareData($data, $includeHeaders) as $fields) {
             fputcsv($fp, $fields, $this->separator, self::DOUBLEQUOTE, self::DOUBLESLASH);
         }
 
@@ -58,12 +59,12 @@ class CSVResponse extends Response
         return $content;
     }
 
-    private function prepareData(array $data): array
+    private function prepareData(array $data, bool $includeHeaders = true): array
     {
         $i = 0;
         $output = [];
         foreach ($data as $row) {
-            if ($i === 0) {
+            if ($i === 0 && $includeHeaders) {
                 $head = [];
                 foreach ($row as $key => $value) {
                     $head[] = $key;
