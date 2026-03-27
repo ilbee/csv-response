@@ -71,4 +71,35 @@ class CSVResponseTest extends TestCase
             $response->getContent()
         );
     }
+
+    public function testNullValue(): void
+    {
+        $response = new CSVResponse([
+            ['name' => 'Marcel', 'email' => null],
+        ]);
+        $this->assertSame(
+            "name;email\nMarcel;\n",
+            $response->getContent()
+        );
+    }
+
+    public function testBooleanValues(): void
+    {
+        $response = new CSVResponse([
+            ['name' => 'Marcel', 'active' => true, 'deleted' => false],
+        ]);
+        $this->assertSame(
+            "name;active;deleted\nMarcel;true;false\n",
+            $response->getContent()
+        );
+    }
+
+    public function testNestedArrayThrowsException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Nested arrays are not supported');
+        new CSVResponse([
+            ['name' => 'Marcel', 'tags' => ['a', 'b']],
+        ]);
+    }
 }
