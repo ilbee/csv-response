@@ -8,6 +8,7 @@ class CSVResponse extends Response
 {
     private string $fileName = 'CSVExport.csv';
     private ?string $separator = null;
+    private string $dateFormat = 'Y-m-d H:i:s';
 
     public const COMMA = ',';
     public const SEMICOLON = ';';
@@ -18,11 +19,13 @@ class CSVResponse extends Response
         array $data,
         ?string $fileName = null,
         ?string $separator = self::SEMICOLON,
-        bool $addBom = false
+        bool $addBom = false,
+        string $dateFormat = 'Y-m-d H:i:s'
     ) {
         parent::__construct();
 
         $this->separator = $separator;
+        $this->dateFormat = $dateFormat;
         if ($fileName) {
             $this->setFileName($fileName);
         }
@@ -71,7 +74,7 @@ class CSVResponse extends Response
             $line = [];
             foreach ($row as $key => $value) {
                 if ($value instanceof \DateTimeInterface) {
-                    $value = $value->format('Y-m-d H:i:s');
+                    $value = $value->format($this->dateFormat);
                 } elseif (is_bool($value)) {
                     $value = $value ? 'true' : 'false';
                 } elseif (is_null($value)) {
