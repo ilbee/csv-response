@@ -50,17 +50,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
-        symfony-version: ['^5.4', '^6.4', '^7.0', '^8.0']
+        php-version: ['8.1', '8.2', '8.3', '8.4', '8.5', '8.6']
+        symfony-version: ['^5.4', '^6.4', '^7.0', '8.0.*', '8.1.*', '8.2.*@beta']
         exclude:
+          # Symfony 7 requires PHP >= 8.2
           - php-version: '8.1'
             symfony-version: '^7.0'
+          # Symfony 8 requires PHP >= 8.4
           - php-version: '8.1'
-            symfony-version: '^8.0'
+            symfony-version: '8.0.*'
+          - php-version: '8.1'
+            symfony-version: '8.1.*'
+          - php-version: '8.1'
+            symfony-version: '8.2.*@beta'
           - php-version: '8.2'
-            symfony-version: '^8.0'
+            symfony-version: '8.0.*'
+          - php-version: '8.2'
+            symfony-version: '8.1.*'
+          - php-version: '8.2'
+            symfony-version: '8.2.*@beta'
           - php-version: '8.3'
-            symfony-version: '^8.0'
+            symfony-version: '8.0.*'
+          - php-version: '8.3'
+            symfony-version: '8.1.*'
+          - php-version: '8.3'
+            symfony-version: '8.2.*@beta'
     steps:
       - uses: actions/checkout@v4
 
@@ -74,7 +88,9 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Require Symfony version
-        run: composer require symfony/http-foundation:${{ matrix.symfony-version }} -W --no-interaction
+        # --no-security-blocking: EOL branches like Symfony 8.0 only have versions
+        # flagged by security advisories; we still want to test compatibility.
+        run: composer require symfony/http-foundation:${{ matrix.symfony-version }} -W --no-interaction --no-security-blocking
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit --coverage-text
