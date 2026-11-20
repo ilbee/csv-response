@@ -255,4 +255,37 @@ class StreamedCSVResponseTest extends TestCase
             $content
         );
     }
+
+    public function testBackslashCannotBreakOutOfEnclosure(): void
+    {
+        $response = new StreamedCSVResponse([
+            ['a' => 'ok', 'b' => 'x\";=1+1'],
+        ]);
+        $this->assertSame(
+            "a;b\nok;\"x\\\"\";=1+1\"\n",
+            $this->getStreamedContent($response)
+        );
+    }
+
+    public function testStringableObjectIsSanitized(): void
+    {
+        $obj = new class {
+            public function __toString(): string
+            {
+                return '=1+1';
+            }
+        };
+
+        $response = new StreamedCSVResponse([['value' => $obj]]);
+        $this->assertSame("value\n'=1+1\n", $this->getStreamedContent($response));
+    }
+
+    public function testNonAsciiFileName(): void
+    {
+        $response = new StreamedCSVResponse($this->getData(), 'été.csv');
+        $this->assertStringContainsString(
+            'filename=_t_.csv',
+            $response->headers->get('content-disposition')
+        );
+    }
 }

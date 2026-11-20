@@ -30,7 +30,7 @@ Carries the shared constants used by both classes:
 | `COMMA` | `,` | Comma separator |
 | `SEMICOLON` | `;` | Semicolon separator (default) |
 | `DOUBLEQUOTE` | `"` | CSV enclosure character |
-| `DOUBLESLASH` | `\` | CSV escape character |
+| `DOUBLESLASH` | `\` | *Deprecated*, unused: output follows RFC 4180 (quotes are doubled, no escape character) |
 
 ### CSVResponseTrait
 
@@ -39,11 +39,14 @@ Contains all shared logic:
 | Method | Description |
 |---|---|
 | `resolveData($data)` | If `$data` is a callable, invokes it and validates the result is iterable |
-| `convertValue($key, $value)` | Converts DateTime, bool, null values; throws on nested arrays |
+| `convertValue($key, $value)` | Converts DateTime, bool, null and `Stringable` values; throws on nested arrays and other objects |
 | `sanitizeValue($value)` | Prefixes formula-triggering characters with `'` to prevent CSV injection |
 | `convertRow($row)` | Applies `convertValue` + `sanitizeValue` to each cell in a row |
 | `extractHeaders($row)` | Returns array keys as header row |
-| `initCSVProperties(...)` | Sets fileName, separator, dateFormat, sanitizeFormulas |
+| `initCSVProperties(...)` | Validates the separator, sets fileName, separator, dateFormat, sanitizeFormulas |
+| `writeCSV($fp, $data, ...)` | Writes the header and data rows, enforcing `maxRows` |
+| `writeLine($fp, $fields)` | Writes one RFC 4180 line (quotes doubled; fields containing the separator, `,`, `;`, quotes, whitespace or line breaks are enclosed) |
+| `setCSVHeaders()` | Sets `Content-Type` and `Content-Disposition` (with an ASCII fallback for non-ASCII filenames) |
 
 ## API Reference
 
@@ -144,6 +147,8 @@ Protected prefixes: `=`, `+`, `-`, `@`, `\t`, `\r`, `\n`
 | `=CMD\|"/C calc"!A0` | `'=CMD\|"/C calc"!A0` |
 | `+SUM(A1:A2)` | `'+SUM(A1:A2)` |
 | `@import` | `'@import` |
+
+Values containing `,` or `;` are always enclosed in double quotes, whatever the configured separator, so a spreadsheet that splits on a different (locale-dependent) separator cannot turn part of a value into a new, unsanitized cell. Objects implementing `__toString()` are cast to string before sanitization.
 
 To disable sanitization (e.g. when values are already trusted):
 

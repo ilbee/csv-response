@@ -2,7 +2,6 @@
 
 namespace Ilbee\CSVResponse;
 
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StreamedCSVResponse extends StreamedResponse implements CSVResponseInterface
@@ -26,49 +25,15 @@ class StreamedCSVResponse extends StreamedResponse implements CSVResponseInterfa
 
         $callback = function () use ($data, $addBom, $includeHeaders, $maxRows) {
             $fp = fopen('php://output', 'w');
-
             if ($addBom) {
                 fwrite($fp, "\xEF\xBB\xBF");
             }
-
-            $i = 0;
-            foreach ($this->resolveData($data) as $row) {
-                if ($maxRows !== null && $i >= $maxRows) {
-                    throw new \OverflowException(
-                        sprintf('Data exceeds the maximum allowed number of rows (%d).', $maxRows)
-                    );
-                }
-                if ($i === 0 && $includeHeaders) {
-                    fputcsv(
-                        $fp,
-                        $this->extractHeaders($row),
-                        $this->separator,
-                        self::DOUBLEQUOTE,
-                        self::DOUBLESLASH
-                    );
-                }
-                fputcsv(
-                    $fp,
-                    $this->convertRow($row),
-                    $this->separator,
-                    self::DOUBLEQUOTE,
-                    self::DOUBLESLASH
-                );
-                $i++;
-            }
-
+            $this->writeCSV($fp, $this->resolveData($data), $includeHeaders, $maxRows);
             fclose($fp);
         };
 
         parent::__construct($callback);
 
-        $this->headers->set('Content-Type', 'text/csv');
-        $this->headers->set(
-            'Content-Disposition',
-            HeaderUtils::makeDisposition(
-                HeaderUtils::DISPOSITION_ATTACHMENT,
-                $this->fileName
-            )
-        );
+        $this->setCSVHeaders();
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Ilbee\CSVResponse;
 
-use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 class CSVResponse extends Response implements CSVResponseInterface
@@ -26,57 +25,15 @@ class CSVResponse extends Response implements CSVResponseInterface
 
         $this->initCSVProperties($fileName, $separator, $dateFormat, $sanitizeFormulas);
 
-        $content = $this->initContent($this->resolveData($data), $includeHeaders, $maxRows);
+        $fp = fopen('php://temp', 'w+');
         if ($addBom) {
-            $content = "\xEF\xBB\xBF" . $content;
+            fwrite($fp, "\xEF\xBB\xBF");
         }
-        $this->setContent($content);
-        $this->headers->set('Content-Type', 'text/csv');
-        $this->headers->set(
-            'Content-Disposition',
-            HeaderUtils::makeDisposition(
-                HeaderUtils::DISPOSITION_ATTACHMENT,
-                $this->fileName
-            )
-        );
-    }
-
-    private function initContent(
-        iterable $data,
-        bool $includeHeaders = true,
-        ?int $maxRows = null
-    ): string {
-        $fp = fopen('php://temp', 'w');
-        $i = 0;
-        foreach ($data as $row) {
-            if ($maxRows !== null && $i >= $maxRows) {
-                throw new \OverflowException(
-                    sprintf('Data exceeds the maximum allowed number of rows (%d).', $maxRows)
-                );
-            }
-            if ($i === 0 && $includeHeaders) {
-                fputcsv(
-                    $fp,
-                    $this->extractHeaders($row),
-                    $this->separator,
-                    self::DOUBLEQUOTE,
-                    self::DOUBLESLASH
-                );
-            }
-            fputcsv(
-                $fp,
-                $this->convertRow($row),
-                $this->separator,
-                self::DOUBLEQUOTE,
-                self::DOUBLESLASH
-            );
-            $i++;
-        }
-
+        $this->writeCSV($fp, $this->resolveData($data), $includeHeaders, $maxRows);
         rewind($fp);
-        $content = stream_get_contents($fp);
+        $this->setContent(stream_get_contents($fp));
         fclose($fp);
 
-        return $content;
+        $this->setCSVHeaders();
     }
 }

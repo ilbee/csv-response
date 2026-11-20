@@ -399,4 +399,91 @@ class CSVResponseTest extends TestCase
             $response->getContent()
         );
     }
+
+    public function testBackslashCannotBreakOutOfEnclosure(): void
+    {
+        $response = new CSVResponse([
+            ['a' => 'ok', 'b' => 'x\";=1+1'],
+        ]);
+        $this->assertSame(
+            "a;b\nok;\"x\\\"\";=1+1\"\n",
+            $response->getContent()
+        );
+    }
+
+    public function testBackslashCannotInjectRow(): void
+    {
+        $response = new CSVResponse([
+            ['a' => 'ok', 'b' => "x\\\"\nINJECTED;ROW"],
+        ]);
+        $this->assertSame(
+            "a;b\nok;\"x\\\"\"\nINJECTED;ROW\"\n",
+            $response->getContent()
+        );
+    }
+
+    public function testStringableObjectIsSanitized(): void
+    {
+        $obj = new class {
+            public function __toString(): string
+            {
+                return '=HYPERLINK("http://evil")';
+            }
+        };
+
+        $response = new CSVResponse([['value' => $obj]]);
+        $this->assertSame(
+            "value\n\"'=HYPERLINK(\"\"http://evil\"\")\"\n",
+            $response->getContent()
+        );
+    }
+
+    public function testForeignSeparatorIsEnclosed(): void
+    {
+        $response = new CSVResponse([['a' => 'x,=1+1']]);
+        $this->assertSame("a\n\"x,=1+1\"\n", $response->getContent());
+
+        $response = new CSVResponse([['a' => 'x;=1+1']], null, CSVResponse::COMMA);
+        $this->assertSame("a\n\"x;=1+1\"\n", $response->getContent());
+    }
+
+    /**
+     * @dataProvider invalidSeparatorProvider
+     */
+    public function testInvalidSeparatorThrows(?string $separator): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The separator must be a single character');
+        new CSVResponse($this->getData(), null, $separator);
+    }
+
+    public function invalidSeparatorProvider(): array
+    {
+        return [[null], [''], [';;'], ['"'], ["\n"]];
+    }
+
+    public function testFileNameWindowsPathTraversal(): void
+    {
+        $response = new CSVResponse($this->getData(), 'C:\\Users\\..\\evil.csv');
+        $this->assertEquals(
+            'attachment; filename=evil.csv',
+            $response->headers->get('content-disposition')
+        );
+    }
+
+    public function testFileNameNonAsciiGetsAsciiFallback(): void
+    {
+        $response = new CSVResponse($this->getData(), 'rapport-été.csv');
+        $disposition = $response->headers->get('content-disposition');
+        $this->assertStringContainsString('filename=rapport-_t_.csv', $disposition);
+        $this->assertStringContainsString("filename*=utf-8''rapport-%C3%A9t%C3%A9.csv", $disposition);
+    }
+
+    public function testFileNameWithPercentGetsAsciiFallback(): void
+    {
+        $response = new CSVResponse($this->getData(), '100%.csv');
+        $disposition = $response->headers->get('content-disposition');
+        $this->assertStringContainsString('filename=100_.csv', $disposition);
+        $this->assertStringContainsString("filename*=utf-8''100%25.csv", $disposition);
+    }
 }

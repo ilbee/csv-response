@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- Fix CSV/formula injection bypass via backslash: `fputcsv()` with `\` as escape character did not double a quote preceded by a backslash, letting a value such as `x\";=1+1` break out of its enclosure into a new, unsanitized cell (or a new row). Output is now written with an RFC 4180 writer (quotes doubled, no escape character)
+- Fix formula sanitization bypass for objects implementing `__toString()` (they are now cast to string before sanitization)
+- Values containing `,` or `;` are always enclosed, so opening the file with a different separator cannot split them into unsanitized cells
+- Filenames: strip all control characters, treat `\` as a path separator, and provide an ASCII fallback to `Content-Disposition` so non-ASCII or `%` characters no longer throw an exception
+
+### Changed
+
+- The separator is validated: it must be a single character other than `"` or a line break (`InvalidArgumentException` otherwise; `null` previously failed inside `fputcsv()`)
+- Fields containing a backslash are no longer enclosed in quotes unless they need it
+
+### Deprecated
+
+- `CSVResponseInterface::DOUBLESLASH` is no longer used
+
 ## [1.9.0] - 2026-03-27
 
 ### Added
